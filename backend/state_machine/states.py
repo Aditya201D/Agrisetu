@@ -1,0 +1,9 @@
+from enum import Enum
+
+class State(str, Enum):
+    ASK_SEARCH_MODE = "ASK_SEARCH_MODE"
+    ASK_DISTRICT = "ASK_DISTRICT"
+    ASK_PRODUCT = "ASK_PRODUCT"
+    ASK_LOCATION = "ASK_LOCATION"
+    SHOW_RETAILERS = "SHOW_RETAILERS"
+    END = "END"
