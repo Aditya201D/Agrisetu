@@ -1,8 +1,6 @@
 from schemas.session import Session
 from state_machine.states import State
 
-from services.retailer_service import (search_retailers_by_district)
-
 def process_message(session:Session, message: str) -> str:
     message = message.strip()
 
@@ -78,20 +76,51 @@ def process_message(session:Session, message: str) -> str:
     
     elif session.state == State.QUERY_DB:
 
+        from services.retailer_service import search_retailers
+
+        retailers = search_retailers(session.district_name or "", session.product_group or "")
+
+        session.last_results = list(retailers)
+
+        if not retailers:
+            session.state = State.NO_RESULTS
+
+            return (
+                f"No retailers found for "
+                f"{session.product_group} "
+                f"in {session.district_name}."
+            )
+        
         session.state = State.SHOW_RETAILERS
 
-        return (
-            "QUERY_DB placeholder.\n"
-            "Database integration comes next."
-        )
-    
+        return "Results found."
+        
     elif session.state == State.SHOW_RETAILERS:
-        session.state = State.POST_RESULTS
-
-        return (
-            "Retailers will be shown here."
+        
+        response = (
+            f"Retailers stocking "
+            f"{session.product_group} "
+            f"in {session.district_name}:\n\n"
         )
+
+        for retailer in (session.last_results or []):
+            response += (
+                f"• {retailer.name}\n"
+                f"  Qty: {retailer.quantity}\n"
+                f"  {retailer.address}\n"
+                f"  {retailer.phone}\n\n"
+            )
+
+        session.state = State.POST_RESULTS
+        return response
     
+    elif session.state == State.NO_RESULTS:
+        session.state = State.POST_RESULTS
+        return (
+            "No inventory found.\n\n"
+            "Try another product or area."
+        )
+           
     elif session.state == State.POST_RESULTS:
         return (
             "Choose an option:\n\n"
@@ -100,5 +129,5 @@ def process_message(session:Session, message: str) -> str:
             "3. Change Area\n"
             "4. Done"
         )
-        
+
     return "Something went wrong. Try again."
