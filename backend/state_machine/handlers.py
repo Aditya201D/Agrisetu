@@ -6,38 +6,99 @@ from services.retailer_service import (search_retailers_by_district)
 def process_message(session:Session, message: str) -> str:
     message = message.strip()
 
-    if session.state == State.ASK_SEARCH_MODE:
+    if session.state == State.AUTH_CHECK:
+        session.state = State.ASK_SEARCH_MODE
 
-        if message.lower() in ["district", 1]:
-            session.state = State.ASK_DISTRICT
-            session.intent = "district_search"
-
-            return "Please enter your district:"
-        
         return (
-            "How would you like to search? \n\n"
-            "1. District\n"
-            "2. Product\n"
-            "3. Near me"
+            "How would you like to search?\n\n"
+            "1. By District\n"
+            "2. Near Me"
+        )
+
+    if session.state == State.ASK_SEARCH_MODE:
+        user_input = message.lower().strip()
+
+        if user_input in ["district", "1"]:
+
+            session.search_mode = "district"
+            session.state = State.ASK_DISTRICT
+
+            return "Please select or enter your district."
+
+        elif user_input in ["near me", "2"]:
+
+            session.search_mode = "near_me"
+            session.state = State.ASK_LOCATION
+
+            return (
+                "Please share your location.\n\n"
+                "Frontend GPS integration will be added later."
+            )
+
+        return (
+            "How would you like to search?\n\n"
+            "1. By District\n"
+            "2. Near Me"
         )
     
     elif session.state == State.ASK_DISTRICT:
-        session.district = message
-        retailers = search_retailers_by_district(message)
-        session.state = State.ASK_SEARCH_MODE
+        session.district_name = message
+        session.state = State.ASK_PRODUCT
 
-        if not retailers:
-            return(f"No retailers found in {message}.")
-        
-        response = f"Retailers in {message}:\n\n"
+        return (
+            f"District selected: {message}\n\n"
+            "Choose a product:\n"
+            "1. Urea\n"
+            "2. DAP\n"
+            "3. NPKs\n"
+            "4. SSP\n"
+            "5. MOP\n"
+            "6. FOM\n"
+            "7. All"
+        )
+    
+    elif session.state == State.ASK_PRODUCT:
+        products = {
+            "1": "Urea",
+            "2": "DAP",
+            "3": "NPKs",
+            "4": "SSP",
+            "5": "MOP",
+            "6": "FOM",
+            "7": "All"
+        }
+        session.product_group = (products.get(message,message))
 
-        for retailer in retailers:
-            response += (
-                f"• {retailer.name}\n"
-                f"  {retailer.address}\n"
-                f"  {retailer.phone}\n\n"
-            )
+        session.state = State.QUERY_DB
 
-        return response
+        return (
+            f"Product selected: "
+            f"{session.product_group}"
+        )
+    
+    elif session.state == State.QUERY_DB:
+
+        session.state = State.SHOW_RETAILERS
+
+        return (
+            "QUERY_DB placeholder.\n"
+            "Database integration comes next."
+        )
+    
+    elif session.state == State.SHOW_RETAILERS:
+        session.state = State.POST_RESULTS
+
+        return (
+            "Retailers will be shown here."
+        )
+    
+    elif session.state == State.POST_RESULTS:
+        return (
+            "Choose an option:\n\n"
+            "1. New Search\n"
+            "2. Change Product\n"
+            "3. Change Area\n"
+            "4. Done"
+        )
         
     return "Something went wrong. Try again."
