@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from services.session_store import get_session
-from state_machine.handlers import process_message
+from state_machine.handlers import process_message, INTERNAL_STATES
 
 router = APIRouter()
 
@@ -16,6 +16,10 @@ def chat(request: ChatRequest):
     reply = process_message(
         session, request.message
     )
+    
+    while session.state in INTERNAL_STATES:
+        reply = process_message(session, "")    #empty string ensures that no input is required
+
     return {
         "reply": reply,
         "session": session.model_dump()

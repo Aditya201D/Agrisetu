@@ -1,5 +1,11 @@
 from schemas.session import Session
-from state_machine.states import State
+from state_machine.states import State\
+
+INTERNAL_STATES = {
+    State.QUERY_DB,
+    State.SHOW_RETAILERS,
+    State.NO_RESULTS
+}
 
 def process_message(session:Session, message: str) -> str:
     message = message.strip()
@@ -93,7 +99,7 @@ def process_message(session:Session, message: str) -> str:
         
         session.state = State.SHOW_RETAILERS
 
-        return "Results found."
+        return ""
         
     elif session.state == State.SHOW_RETAILERS:
         
