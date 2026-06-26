@@ -9,7 +9,7 @@ db_name = os.getenv("DB_NAME")
 from sqlalchemy import create_engine
 
 DATABASE_URL = (
-    "mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@localhost/{DB_NAME}"
+    f"mysql+pymysql://{db_username}:{db_password}@localhost/{db_name}"
 )
 
 engine = create_engine(DATABASE_URL, echo=True, pool_pre_ping=True)
