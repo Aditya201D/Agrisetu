@@ -129,12 +129,60 @@ def process_message(session:Session, message: str) -> str:
         )
            
     elif session.state == State.POST_RESULTS:
-        return (
-            "Choose an option:\n\n"
-            "1. New Search\n"
-            "2. Change Product\n"
-            "3. Change Area\n"
-            "4. Done"
-        )
+
+        choice = message.lower().strip()
+
+        if choice in ["1", "new search"]:
+            session.search_mode = None
+            session.district_name = None
+            session.latitude = None
+            session.longitude = None
+            session.radius_km = None
+            session.product_group = None
+            session.last_results = None
+
+            session.state = State.ASK_SEARCH_MODE
+
+            return (
+                "How would you like to search?\n\n"
+                "1. By District\n"
+                "2. Near Me"
+            )
+        
+        if choice in ["2", "change product"]:
+            session.product_group = None
+            session.last_results = None
+
+            session.state = State.ASK_PRODUCT
+
+            return (
+                "Choose a product:\n"
+                "1. Urea\n"
+                "2. DAP\n"
+                "3. NPKs\n"
+                "4. SSP\n"
+                "5. MOP\n"
+                "6. FOM\n"
+                "7. All"
+            )
+        
+        if choice in ["3", "change area"]:
+            session.district_name = None
+            session.latitude = None
+            session.longitude = None
+            session.radius_km = None
+            session.last_results = None
+
+            session.state = State.ASK_SEARCH_MODE
+
+            return (
+                "How would you like to search?\n\n"
+                "1. By District\n"
+                "2. Near Me"
+            )
+        
+        if choice in ["4", "done"]:
+            session.state = State.END
+            return "Thank you for using AgriSetu!" 
 
     return "Something went wrong. Try again."
