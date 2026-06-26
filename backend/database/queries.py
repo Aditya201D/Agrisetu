@@ -30,6 +30,6 @@ def get_retailers_by_district_and_product(district:str, product:str):
             query,
             {"district": district, "product": product}
         )
-        rows = result.fetchall()
+        rows = result.mappings().all()
 
         return rows

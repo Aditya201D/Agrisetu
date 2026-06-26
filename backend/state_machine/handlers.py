@@ -103,12 +103,13 @@ def process_message(session:Session, message: str) -> str:
             f"in {session.district_name}:\n\n"
         )
 
-        for retailer in (session.last_results or []):
+        for retailer in session.last_results or []:
+
             response += (
-                f"• {retailer.name}\n"
-                f"  Qty: {retailer.quantity}\n"
-                f"  {retailer.address}\n"
-                f"  {retailer.phone}\n\n"
+                f"• {retailer['name']}\n"
+                f"  Qty: {retailer['quantity']}\n"
+                f"  {retailer['address']}\n"
+                f"  {retailer['phone']}\n\n"
             )
 
         session.state = State.POST_RESULTS
