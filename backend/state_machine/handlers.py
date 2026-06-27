@@ -119,13 +119,29 @@ def process_message(session:Session, message: str) -> str:
             )
 
         session.state = State.POST_RESULTS
+
+        response += (
+            "--------------------------------\n"
+            "What would you like to do next?\n\n"
+            "1. New Search\n"
+            "2. Change Product\n"
+            "3. Change Area\n"
+            "4. Done"
+        )
+
         return response
     
     elif session.state == State.NO_RESULTS:
         session.state = State.POST_RESULTS
         return (
             "No inventory found.\n\n"
-            "Try another product or area."
+            "Try another product or area.\n\n"
+            "--------------------------------\n"
+            "What would you like to do next?\n\n"
+            "1. New Search\n"
+            "2. Change Product\n"
+            "3. Change Area\n"
+            "4. Done"
         )
            
     elif session.state == State.POST_RESULTS:
