@@ -1,5 +1,6 @@
 from schemas.session import Session
-from state_machine.states import State\
+from state_machine.states import State
+from state_machine.messages import (SEARCH_MODE_MENU, PRODUCT_MENU, POST_RESULTS_MENU)
 
 INTERNAL_STATES = {
     State.QUERY_DB,
@@ -13,11 +14,7 @@ def process_message(session:Session, message: str) -> str:
     if session.state == State.AUTH_CHECK:
         session.state = State.ASK_SEARCH_MODE
 
-        return (
-            "How would you like to search?\n\n"
-            "1. By District\n"
-            "2. Near Me"
-        )
+        return SEARCH_MODE_MENU
 
     if session.state == State.ASK_SEARCH_MODE:
         user_input = message.lower().strip()
@@ -39,27 +36,13 @@ def process_message(session:Session, message: str) -> str:
                 "Frontend GPS integration will be added later."
             )
 
-        return (
-            "How would you like to search?\n\n"
-            "1. By District\n"
-            "2. Near Me"
-        )
+        return SEARCH_MODE_MENU
     
     elif session.state == State.ASK_DISTRICT:
         session.district_name = message
         session.state = State.ASK_PRODUCT
 
-        return (
-            f"District selected: {message}\n\n"
-            "Choose a product:\n"
-            "1. Urea\n"
-            "2. DAP\n"
-            "3. NPKs\n"
-            "4. SSP\n"
-            "5. MOP\n"
-            "6. FOM\n"
-            "7. All"
-        )
+        return PRODUCT_MENU
     
     elif session.state == State.ASK_PRODUCT:
         products = {
@@ -120,14 +103,7 @@ def process_message(session:Session, message: str) -> str:
 
         session.state = State.POST_RESULTS
 
-        response += (
-            "--------------------------------\n"
-            "What would you like to do next?\n\n"
-            "1. New Search\n"
-            "2. Change Product\n"
-            "3. Change Area\n"
-            "4. Done"
-        )
+        response += POST_RESULTS_MENU
 
         return response
     
@@ -136,12 +112,8 @@ def process_message(session:Session, message: str) -> str:
         return (
             "No inventory found.\n\n"
             "Try another product or area.\n\n"
-            "--------------------------------\n"
-            "What would you like to do next?\n\n"
-            "1. New Search\n"
-            "2. Change Product\n"
-            "3. Change Area\n"
-            "4. Done"
+            "--------------------------------\n\n"
+            + POST_RESULTS_MENU
         )
            
     elif session.state == State.POST_RESULTS:
@@ -159,11 +131,7 @@ def process_message(session:Session, message: str) -> str:
 
             session.state = State.ASK_SEARCH_MODE
 
-            return (
-                "How would you like to search?\n\n"
-                "1. By District\n"
-                "2. Near Me"
-            )
+            return SEARCH_MODE_MENU
         
         if choice in ["2", "change product"]:
             session.product_group = None
@@ -171,16 +139,7 @@ def process_message(session:Session, message: str) -> str:
 
             session.state = State.ASK_PRODUCT
 
-            return (
-                "Choose a product:\n"
-                "1. Urea\n"
-                "2. DAP\n"
-                "3. NPKs\n"
-                "4. SSP\n"
-                "5. MOP\n"
-                "6. FOM\n"
-                "7. All"
-            )
+            return PRODUCT_MENU
         
         if choice in ["3", "change area"]:
             session.district_name = None
@@ -191,11 +150,7 @@ def process_message(session:Session, message: str) -> str:
 
             session.state = State.ASK_SEARCH_MODE
 
-            return (
-                "How would you like to search?\n\n"
-                "1. By District\n"
-                "2. Near Me"
-            )
+            return SEARCH_MODE_MENU
         
         if choice in ["4", "done"]:
             session.state = State.END
