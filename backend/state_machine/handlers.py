@@ -1,6 +1,7 @@
 from schemas.session import Session
 from state_machine.states import State
 from state_machine.messages import (SEARCH_MODE_MENU, PRODUCT_MENU, POST_RESULTS_MENU)
+from state_machine.utils import reset_session
 
 INTERNAL_STATES = {
     State.QUERY_DB,
@@ -121,13 +122,7 @@ def process_message(session:Session, message: str) -> str:
         choice = message.lower().strip()
 
         if choice in ["1", "new search"]:
-            session.search_mode = None
-            session.district_name = None
-            session.latitude = None
-            session.longitude = None
-            session.radius_km = None
-            session.product_group = None
-            session.last_results = None
+            reset_session(session)
 
             session.state = State.ASK_SEARCH_MODE
 
