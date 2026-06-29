@@ -1,5 +1,6 @@
 from sqlalchemy import text
 from database.connection import engine
+from schemas.retailer import RetailerResult
 
 
 def get_retailers_by_district_and_product(
@@ -34,4 +35,16 @@ def get_retailers_by_district_and_product(
             },
         )
 
-        return result.mappings().all()
+    rows = result.mappings().all()
+
+    return [
+        RetailerResult(
+            retailer_id=row["retailer_id"],
+            agency_name=row["agency_name"],
+            product_name=row["product_name"],
+            quantity=float(row["quantity"]),
+            latitude=row["latitude"],
+            longitude=row["longitude"],
+        )
+        for row in rows
+    ]

@@ -70,7 +70,7 @@ def process_message(session:Session, message: str) -> str:
 
         retailers = search_retailers(session.district_name or "", session.product_group or "")
 
-        session.last_results = list(retailers)
+        session.last_results = retailers
 
         if not retailers:
             session.state = State.NO_RESULTS
@@ -96,9 +96,9 @@ def process_message(session:Session, message: str) -> str:
         for retailer in session.last_results or []:
 
             response += (
-                f"• {retailer['agency_name']}\n"
-                f"  Product: {retailer['product_name']}\n"
-                f"  Qty: {retailer['quantity']}\n"
+                f"• {retailer.agency_name}\n"
+                f"  Product: {retailer.product_name}\n"
+                f"  Qty: {retailer.quantity}\n"
             )
 
         session.state = State.POST_RESULTS

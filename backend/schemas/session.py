@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from state_machine.states import State
 from typing import Optional
+from schemas.retailer import RetailerResult
 
 class Session(BaseModel):
     state: State = State.AUTH_CHECK
@@ -10,4 +11,4 @@ class Session(BaseModel):
     longitude: float | None = None
     radius_km: int | None = None
     product_group: str | None = None
-    last_results: list | None = None
+    last_results: list[RetailerResult] | None = None
