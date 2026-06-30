@@ -1,4 +1,5 @@
 from state_machine.states import State
+from state_machine.ui_text import MENU_MAP
 
 from state_machine.handlers.auth import auth_handler
 from state_machine.handlers.search_mode import search_mode_handler
@@ -10,44 +11,32 @@ from state_machine.handlers.post_results import post_results_handler
 from state_machine.handlers.no_results import no_results_handler
 
 HANDLERS = {
-
     State.AUTH_CHECK: auth_handler,
-
     State.ASK_SEARCH_MODE: search_mode_handler,
-
     State.ASK_DISTRICT: district_handler,
-
     State.ASK_PRODUCT: product_handler,
-
     State.QUERY_DB: query_db_handler,
-
     State.SHOW_RETAILERS: show_retailers_handler,
-
     State.POST_RESULTS: post_results_handler,
-
     State.NO_RESULTS: no_results_handler,
 }
 
 INTERNAL_STATES = {
-
     State.AUTH_CHECK,
-
     State.QUERY_DB,
-
     State.SHOW_RETAILERS,
-
 }
 
 def process_message(session, message):
     while True:
         handler = HANDLERS[session.state]
         reply = handler(session, message)
-
+        # Handler generated a complete response
         if reply is not None:
             return reply
-
+        # Continue automatic states
         if session.state in INTERNAL_STATES:
             message = ""
             continue
-
-        return None
+        # Waiting for user input
+        return MENU_MAP[session.state]

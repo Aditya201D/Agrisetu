@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from services.session_store import get_session
-from state_machine.handlers import process_message, INTERNAL_STATES
+from state_machine.dispatcher import process_message, INTERNAL_STATES
 
 router = APIRouter()
 

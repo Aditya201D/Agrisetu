@@ -1,7 +1,17 @@
+from state_machine.states import State
+
 SEARCH_MODE_MENU = (
     "How would you like to search?\n\n"
     "1. By District\n"
     "2. Near Me"
+)
+
+DISTRICT_PROMPT = (
+    "Please select or enter your district."
+)
+
+LOCATION_PROMPT = (
+    "Please share your location."
 )
 
 PRODUCT_MENU = (
@@ -24,21 +34,6 @@ POST_RESULTS_MENU = (
     "4. Done"
 )
 
-DISTRICT_PROMPT = (
-    "Please select or enter your district."
-)
-
-LOCATION_PROMPT = (
-    "Please share your location."
-)
-
-RADIUS_MENU = (
-    "Select a search radius:\n\n"
-    "1. 25 km\n"
-    "2. 50 km\n"
-    "3. 100 km"
-)
-
 NO_RESULTS_MESSAGE = (
     "No inventory found.\n\n"
     "Try another product or area."
@@ -51,3 +46,12 @@ SERVER_ERROR_MESSAGE = (
 SESSION_EXPIRED_MESSAGE = (
     "Your session has expired.\nPlease log in again."
 )
+
+MENU_MAP = {
+    State.ASK_SEARCH_MODE: SEARCH_MODE_MENU,
+    State.ASK_DISTRICT: DISTRICT_PROMPT,
+    State.ASK_LOCATION: LOCATION_PROMPT,
+    State.ASK_PRODUCT: PRODUCT_MENU,
+    State.POST_RESULTS: POST_RESULTS_MENU,
+    State.NO_RESULTS: NO_RESULTS_MESSAGE,
+}
