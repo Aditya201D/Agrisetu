@@ -48,3 +48,31 @@ def get_retailers_by_district_and_product(
         )
         for row in rows
     ]
+
+def nearby_retailers(
+    latitude,
+    longitude,
+    radius_km,
+    product,
+):
+    query = text("""
+            SELECT
+            retailer_id,
+            agency_name,
+            product_name,
+            quantity,
+            latitude,
+            longitude
+        FROM retailer_stock
+        WHERE product_name = %s
+        AND (
+            6371 * acos(
+                cos(radians(%s))
+                * cos(radians(latitude))
+                * cos(radians(longitude) - radians(%s))
+                + sin(radians(%s))
+                * sin(radians(latitude))
+            )
+        ) <= %s
+        LIMIT 10;
+                 """)

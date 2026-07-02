@@ -4,6 +4,7 @@ from state_machine.ui_text import MENU_MAP
 from state_machine.handlers.auth import auth_handler
 from state_machine.handlers.search_mode import search_mode_handler
 from state_machine.handlers.district import district_handler
+from state_machine.handlers.location import location_handler
 from state_machine.handlers.product import product_handler
 from state_machine.handlers.query_db import query_db_handler
 from state_machine.handlers.show_retailers import show_retailers_handler
@@ -14,6 +15,7 @@ HANDLERS = {
     State.AUTH_CHECK: auth_handler,
     State.ASK_SEARCH_MODE: search_mode_handler,
     State.ASK_DISTRICT: district_handler,
+    State.ASK_LOCATION: location_handler,
     State.ASK_PRODUCT: product_handler,
     State.QUERY_DB: query_db_handler,
     State.SHOW_RETAILERS: show_retailers_handler,

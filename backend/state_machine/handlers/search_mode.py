@@ -16,6 +16,6 @@ def search_mode_handler(session, message):
         session.search_mode = "near_me"
         session.state = State.ASK_LOCATION
 
-        return None
+        return "Please share your location."
 
     return SEARCH_MODE_MENU
