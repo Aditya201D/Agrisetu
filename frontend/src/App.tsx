@@ -14,8 +14,11 @@ export default function App() {
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [session, setSession] = useState<Session | null>(null);
+    const [loading, setLoading] = useState(false);
 
     async function handleSend(text: string) {
+        if (loading) return;
+
         if (text.trim() !== "") {
             setMessages(prev => [
                 ...prev,
@@ -26,25 +29,28 @@ export default function App() {
             ]);
         }
 
-        console.log("Sending:", text);
-        const response = await sendMessage(USER_ID, text);
-        console.log("Received:", response);
+        setLoading(true);
 
-        if (response.reply.trim() !== "") {
-            setMessages(prev => [
-                ...prev,
-                {
-                    sender: "bot",
-                    text: response.reply,
-                },
-            ]);
+        try {
+            const response = await sendMessage(USER_ID, text);
+
+            if (response.reply.trim() !== "") {
+                setMessages(prev => [
+                    ...prev,
+                    {
+                        sender: "bot",
+                        text: response.reply,
+                    },
+                ]);
+            }
+
+            setSession(response.session);
+        } finally {
+            setLoading(false);
         }
-
-        setSession(response.session);
     }
 
     useEffect(() => {
-        console.log("App mounted");
         handleSend("");
     }, []);
 

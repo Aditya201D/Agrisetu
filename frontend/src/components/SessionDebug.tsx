@@ -7,5 +7,11 @@ interface Props {
 export default function SessionDebug({ session }: Props) {
     if (!session) return null;
 
-    return <pre className="bg-gray-100 text-xs p-4 overflow-auto border-t">{JSON.stringify(session, null, 2)}</pre>;
+    return (
+        <div className="fixed bottom-24 right-4 w-80 max-h-96 overflow-auto rounded-lg border bg-white shadow-xl text-xs p-3">
+            <h3 className="font-semibold mb-2">Session Debug</h3>
+
+            <pre className="whitespace-pre-wrap">{JSON.stringify(session, null, 2)}</pre>
+        </div>
+    );
 }
