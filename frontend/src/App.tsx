@@ -19,22 +19,20 @@ export default function App() {
     async function handleSend(text: string) {
         if (loading) return;
 
-        if (text.trim() !== "") {
-            setMessages(prev => [
-                ...prev,
-                {
-                    sender: "user",
-                    text,
-                },
-            ]);
-        }
+        setMessages(prev => [
+            ...prev,
+            {
+                sender: "user",
+                text,
+            },
+        ]);
 
         setLoading(true);
 
         try {
             const response = await sendMessage(USER_ID, text);
 
-            if (response.reply.trim() !== "") {
+            if (response.reply.trim()) {
                 setMessages(prev => [
                     ...prev,
                     {
@@ -45,6 +43,16 @@ export default function App() {
             }
 
             setSession(response.session);
+        } catch (error) {
+            console.error(error);
+
+            setMessages(prev => [
+                ...prev,
+                {
+                    sender: "bot",
+                    text: "Unable to contact AgriSetu server.\nPlease try again.",
+                },
+            ]);
         } finally {
             setLoading(false);
         }
@@ -57,11 +65,12 @@ export default function App() {
     return (
         <div className="h-screen flex flex-col">
             <Header />
-
-            <ChatContainer messages={messages} />
-
-            <ChatInput onSend={handleSend} />
-
+            <ChatContainer
+                messages={messages}
+                retailers={session?.last_results ?? []}
+                showRetailers={session?.state === "POST_RESULTS"}
+            />
+            <ChatInput onSend={handleSend} disabled={loading} />
             <SessionDebug session={session} />
         </div>
     );

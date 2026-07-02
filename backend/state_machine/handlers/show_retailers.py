@@ -1,23 +1,20 @@
 from state_machine.states import State
-from state_machine.ui_text import POST_RESULTS_MENU
 
 def show_retailers_handler(session, message):
-    response = (
-        f"Retailers stocking "
-        f"{session.product_group} "
-        f"in {session.district_name}:\n\n"
-    )
 
-    for retailer in session.last_results or []:
-
-        response += (
-            f"• {retailer.agency_name}\n"
-            f"  Product: {retailer.product_name}\n"
-            f"  Qty: {retailer.quantity}\n"
-        )
+    count = len(session.last_results or [])
 
     session.state = State.POST_RESULTS
 
-    response += POST_RESULTS_MENU
-
-    return response
+    return (
+        f"Found {count} retailers stocking "
+        f"{session.product_group} "
+        f"in {session.district_name}.\n\n"
+        "See the table below.\n\n"
+        "--------------------------------\n"
+        "What would you like to do next?\n\n"
+        "1. New Search\n"
+        "2. Change Product\n"
+        "3. Change Area\n"
+        "4. Done"
+    )
