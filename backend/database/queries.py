@@ -20,11 +20,11 @@ def get_retailers_by_district_and_product(
         ON r.retailer_id = i.retailer_id
     JOIN products p
         ON i.product_id = p.id
-    WHERE r.district = :district
+    WHERE r.district_name = :district_name
     """
 
     params = {
-        "district": district,
+        "district_name": district,
     }
 
     if product != "All":
