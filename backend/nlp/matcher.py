@@ -1,8 +1,13 @@
 from rapidfuzz import process, fuzz
 from database.queries import get_all_districts
 from state_machine.states import State
+from dataclasses import dataclass
 
 DISTRICTS = get_all_districts()
+@dataclass
+class MatchResult:
+    value: str
+    score: float
 
 SEARCH_MODE_CHOICES = {
     "1": [
@@ -94,9 +99,9 @@ def fuzzy_match(
     matched_text, score, _ = match
 
     if score >= threshold:
-        return aliases[matched_text]
-
-    return text
+        return MatchResult(value=aliases[matched_text], score=score)
+    
+    return MatchResult(value=text, score=score)
 
 def normalize_search_mode(message: str):
     return fuzzy_match(
@@ -116,7 +121,7 @@ def normalize_post_results(message: str):
         POST_RESULT_CHOICES,
     )
 
-def normalize_district(message: str):
+def normalize_district(message: str) -> MatchResult:
     match = process.extractOne(
         message,
         DISTRICTS,
@@ -124,33 +129,40 @@ def normalize_district(message: str):
     )
 
     if match is None:
-        return message
+        return MatchResult(
+            value=message,
+            score=0,
+        )
 
     district, score, _ = match
 
-    return district if score >= 80 else message
+    if score >= 80:
+        return MatchResult(
+            value=district,
+            score=score,
+        )
+
+    return MatchResult(
+        value=message,
+        score=score,
+    )
 
 def normalize_message(state: State, message: str):
     if not message.strip():
         return message
 
     if state == State.ASK_SEARCH_MODE:
-        return normalize_search_mode(message)
+        result = normalize_search_mode(message)
+    elif state == State.ASK_PRODUCT:
+        result = normalize_product(message)
+    elif state == State.POST_RESULTS:
+        result = normalize_post_results(message)
+    elif state == State.ASK_DISTRICT:
+        result = normalize_district(message)
+    else:
+        return message
 
-    if state == State.ASK_PRODUCT:
-        return normalize_product(message)
+    if result.value != message:
+        print(f"[RapidFuzz] '{message}' -> '{result.value}' ({result.score:.1f})")
 
-    if state == State.POST_RESULTS:
-        return normalize_post_results(message)
-
-    if state == State.ASK_DISTRICT:
-        return normalize_district(message)
-    
-    normalized = ...
-    original = message
-
-    if normalized != message:
-        print(f"[RapidFuzz] '{original}' -> '{normalized}'")
-        return normalized
-
-    return message
+    return result.value
