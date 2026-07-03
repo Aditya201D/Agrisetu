@@ -112,3 +112,15 @@ def nearby_retailers(
         RetailerResult.model_validate(row)
         for row in rows
     ]
+
+def get_all_districts():
+    query = text("""
+        SELECT DISTINCT district_name
+        FROM retailers
+        ORDER BY district_name
+    """)
+
+    with engine.connect() as conn:
+        rows = conn.execute(query).scalars().all()
+
+    return rows

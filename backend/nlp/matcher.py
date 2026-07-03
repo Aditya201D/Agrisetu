@@ -1,4 +1,7 @@
 from rapidfuzz import process, fuzz
+from database.queries import get_all_districts
+
+DISTRICTS = get_all_districts()
 
 SEARCH_MODE_CHOICES = {
     "1": [
@@ -112,13 +115,10 @@ def normalize_post_results(message: str):
         POST_RESULT_CHOICES,
     )
 
-def normalize_district(
-    message: str,
-    districts: list[str],
-):
+def normalize_district(message: str):
     match = process.extractOne(
         message,
-        districts,
+        DISTRICTS,
         scorer=fuzz.WRatio,
     )
 
@@ -127,8 +127,5 @@ def normalize_district(
 
     district, score, _ = match
 
-    if score >= 80:
-        return district
-
-    return message
+    return district if score >= 80 else message
 
