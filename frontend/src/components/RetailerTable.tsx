@@ -19,6 +19,7 @@ export default function RetailerTable({ retailers, visible }: Props) {
                         agency_name: retailer.agency_name,
                         latitude: retailer.latitude,
                         longitude: retailer.longitude,
+                        distance: retailer.distance,
                         products: [],
                     });
                 }
@@ -41,8 +42,8 @@ export default function RetailerTable({ retailers, visible }: Props) {
                 <thead className="bg-gray-100">
                     <tr>
                         <th className="text-left p-3">Agency</th>
-                        <th className="text-left p-3">Products</th>
-                        <th className="text-center p-3">Quantity</th>
+                        <th className="text-left p-3">Available Products</th>
+                        <th className="p-3 text-center">Distance</th>
                         <th className="text-center p-3">Map</th>
                     </tr>
                 </thead>
@@ -54,14 +55,14 @@ export default function RetailerTable({ retailers, visible }: Props) {
 
                             <td className="p-3">
                                 {retailer.products.map((p: any) => (
-                                    <div key={p.product_name}>{p.product_name}</div>
+                                    <div key={p.product_name}>
+                                        {p.product_name} ({p.quantity})
+                                    </div>
                                 ))}
                             </td>
 
-                            <td className="p-3 text-center">
-                                {retailer.products.map((p: any) => (
-                                    <div key={p.product_name}>{p.quantity}</div>
-                                ))}
+                            <td className="text-center p-3">
+                                {retailer.distance != null ? `${retailer.distance.toFixed(2)} km` : "-"}
                             </td>
 
                             <td className="p-3 text-center">

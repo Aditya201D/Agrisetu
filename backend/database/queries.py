@@ -77,7 +77,7 @@ def nearby_retailers(
     JOIN products p
         ON i.product_id = p.id
 
-    WHERE (
+    WHERE ROUND(
         6371 * acos(
             cos(radians(:lat))
             * cos(radians(r.latitude))

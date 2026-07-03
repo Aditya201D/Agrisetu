@@ -5,6 +5,7 @@ export interface Retailer {
     quantity: number;
     latitude: number;
     longitude: number;
+    distance?: number;
 }
 
 export interface Session {

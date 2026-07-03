@@ -7,3 +7,4 @@ class RetailerResult(BaseModel):
     quantity: float
     latitude: float
     longitude: float
+    distance: float | None = None
