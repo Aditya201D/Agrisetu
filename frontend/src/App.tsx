@@ -89,7 +89,7 @@ export default function App() {
                 showRetailers={session?.state === "POST_RESULTS"}
             />
             <OptionButtons options={options} onSelect={handleSend} />
-            <ChatInput onSend={handleSend} disabled={loading} />
+            <ChatInput onSend={handleSend} loading={loading} />
             <SessionDebug session={session} />
         </div>
     );

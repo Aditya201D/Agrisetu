@@ -2,10 +2,10 @@ import { useState } from "react";
 
 interface Props {
     onSend: (message: string) => void;
-    disabled?: boolean;
+    loading?: boolean;
 }
 
-export default function ChatInput({ onSend, disabled = false }: Props) {
+export default function ChatInput({ onSend, loading = false }: Props) {
     const [text, setText] = useState("");
 
     function handleSubmit(e: React.FormEvent) {
@@ -25,15 +25,15 @@ export default function ChatInput({ onSend, disabled = false }: Props) {
     return (
         <form onSubmit={handleSubmit} className="flex gap-3 p-4 border-t">
             <input
-                disabled={disabled}
+                disabled={loading}
                 className="flex-1 border rounded-lg px-4 py-3"
                 placeholder="Type your message..."
                 value={text}
                 onChange={e => setText(e.target.value)}
             />
 
-            <button disabled={disabled} className="bg-green-700 text-white px-6 rounded-lg">
-                {disabled ? "..." : "Send"}
+            <button disabled={loading} className="bg-green-700 text-white px-6 rounded-lg">
+                {loading ? "Searching..." : "Send"}
             </button>
         </form>
     );
