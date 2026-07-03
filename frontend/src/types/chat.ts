@@ -21,6 +21,7 @@ export interface Session {
 export interface ChatResponse {
     reply: string;
     session: Session;
+    options: string[];
 }
 
 export interface Message {

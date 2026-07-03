@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import ChatContainer from "./components/ChatContainer";
 import ChatInput from "./components/ChatInput";
 import Header from "./components/Header";
+import OptionButtons from "./components/OptionButtons";
 import SessionDebug from "./components/SessionDebug";
 
 import { sendMessage } from "./api/chat";
@@ -17,8 +18,10 @@ export default function App() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(false);
+    const [options, setOptions] = useState<string[]>([]);
 
     async function handleSend(text: string) {
+        setOptions([]);
         if (loading) return;
 
         setMessages(prev => [
@@ -45,6 +48,7 @@ export default function App() {
             }
 
             setSession(response.session);
+            setOptions(response.options);
         } catch (error) {
             console.error(error);
 
@@ -84,6 +88,7 @@ export default function App() {
                 retailers={session?.last_results ?? []}
                 showRetailers={session?.state === "POST_RESULTS"}
             />
+            <OptionButtons options={options} onSelect={handleSend} />
             <ChatInput onSend={handleSend} disabled={loading} />
             <SessionDebug session={session} />
         </div>

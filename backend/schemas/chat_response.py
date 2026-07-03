@@ -8,3 +8,4 @@ class ChatResponse(BaseModel):
     session: Session
     buttons: list[str] = []
     table: Optional[list] = None
+    options: list[str] = []
