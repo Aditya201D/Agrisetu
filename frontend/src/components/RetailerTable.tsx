@@ -10,6 +10,29 @@ export default function RetailerTable({ retailers, visible }: Props) {
         return null;
     }
 
+    const groupedRetailers = Array.from(
+        retailers
+            .reduce((map, retailer) => {
+                if (!map.has(retailer.retailer_id)) {
+                    map.set(retailer.retailer_id, {
+                        retailer_id: retailer.retailer_id,
+                        agency_name: retailer.agency_name,
+                        latitude: retailer.latitude,
+                        longitude: retailer.longitude,
+                        products: [],
+                    });
+                }
+
+                map.get(retailer.retailer_id).products.push({
+                    product_name: retailer.product_name,
+                    quantity: retailer.quantity,
+                });
+
+                return map;
+            }, new Map<number, any>())
+            .values(),
+    );
+
     return (
         <div className="mx-4 mb-4 overflow-hidden rounded-lg border bg-white shadow">
             <div className="bg-green-700 px-4 py-3 font-semibold text-white">Retailers Found ({retailers.length})</div>
@@ -17,20 +40,40 @@ export default function RetailerTable({ retailers, visible }: Props) {
             <table className="w-full text-sm">
                 <thead className="bg-gray-100">
                     <tr>
-                        <th className="p-3 text-left">Agency</th>
-                        <th className="p-3 text-left">Product</th>
-                        <th className="p-3 text-center">Quantity</th>
+                        <th className="text-left p-3">Agency</th>
+                        <th className="text-left p-3">Products</th>
+                        <th className="text-center p-3">Quantity</th>
+                        <th className="text-center p-3">Map</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    {retailers.map(retailer => (
-                        <tr key={retailer.retailer_id} className="border-t">
-                            <td className="p-3">{retailer.agency_name}</td>
+                    {groupedRetailers.map(retailer => (
+                        <tr key={retailer.retailer_id} className="border-t align-top">
+                            <td className="p-3 font-medium">{retailer.agency_name}</td>
 
-                            <td className="p-3">{retailer.product_name}</td>
+                            <td className="p-3">
+                                {retailer.products.map((p: any) => (
+                                    <div key={p.product_name}>{p.product_name}</div>
+                                ))}
+                            </td>
 
-                            <td className="p-3 text-center">{retailer.quantity}</td>
+                            <td className="p-3 text-center">
+                                {retailer.products.map((p: any) => (
+                                    <div key={p.product_name}>{p.quantity}</div>
+                                ))}
+                            </td>
+
+                            <td className="p-3 text-center">
+                                <a
+                                    href={`https://www.google.com/maps?q=${retailer.latitude},${retailer.longitude}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-green-700 hover:underline"
+                                >
+                                    View
+                                </a>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
