@@ -1,5 +1,6 @@
 from state_machine.states import State
 from schemas.session import Session
+from config.settings import SEARCH_RADIUS_KM
 
 def location_handler(session: Session, message):
     try:
@@ -7,7 +8,7 @@ def location_handler(session: Session, message):
 
         session.latitude = lat
         session.longitude = lon
-        session.radius_km = 10
+        session.radius_km = SEARCH_RADIUS_KM
 
         session.state = State.ASK_PRODUCT
 

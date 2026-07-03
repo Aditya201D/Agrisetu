@@ -1,5 +1,5 @@
 from state_machine.states import State
-from services.retailer_service import search_retailers
+from services.retailer_service import search_retailers, search_retailers_nearby
 
 def query_db_handler(session, message):
     if session.search_mode == "district":
@@ -9,12 +9,19 @@ def query_db_handler(session, message):
         )
 
     else:
-        retailers = search_retailers_nearby(
-            session.latitude,
-            session.longitude,
-            session.radius_km,
-            session.product_group,
-        )
+        retailers = []
+
+        for radius in [10, 20, 30, 50]:
+            retailers = search_retailers_nearby(
+                session.latitude,
+                session.longitude,
+                radius,
+                session.product_group,
+            )
+
+            if retailers:
+                session.radius_km = radius
+                break
 
     session.last_results = retailers
 

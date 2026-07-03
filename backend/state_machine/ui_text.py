@@ -35,8 +35,9 @@ POST_RESULTS_MENU = (
 )
 
 NO_RESULTS_MESSAGE = (
-    "No inventory found.\n\n"
-    "Try another product or area."
+    "No inventory found.\n"
+    "Try another product or area.\n\n"
+    + POST_RESULTS_MENU
 )
 
 SERVER_ERROR_MESSAGE = (

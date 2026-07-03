@@ -27,6 +27,7 @@ INTERNAL_STATES = {
     State.AUTH_CHECK,
     State.QUERY_DB,
     State.SHOW_RETAILERS,
+    State.NO_RESULTS
 }
 
 def process_message(session, message):

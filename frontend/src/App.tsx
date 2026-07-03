@@ -9,6 +9,8 @@ import { sendMessage } from "./api/chat";
 
 import type { Message, Session } from "./types/chat";
 
+import { getCurrentLocation } from "./services/geolocation";
+
 export default function App() {
     const USER_ID = "user1";
 
@@ -61,6 +63,18 @@ export default function App() {
     useEffect(() => {
         handleSend("");
     }, []);
+
+    useEffect(() => {
+        async function sendLocation() {
+            if (session?.state !== "ASK_LOCATION") return;
+
+            const location = await getCurrentLocation();
+
+            handleSend(location);
+        }
+
+        sendLocation();
+    }, [session]);
 
     return (
         <div className="h-screen flex flex-col">

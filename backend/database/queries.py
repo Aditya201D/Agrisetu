@@ -7,72 +7,108 @@ def get_retailers_by_district_and_product(
     district: str,
     product: str,
 ):
-    query = text("""
-        SELECT
-            r.retailer_id, r.agency_name, r.latitude, r.longitude, p.product_group AS product_name, i.quantity
-        FROM inventory i
-        JOIN retailers r
-            ON i.retailer_id = r.retailer_id
-        JOIN products p
-            ON i.product_id = p.id
-        WHERE
-            r.district_name = :district
-            AND
-            p.product_group = :product
-            AND
-            i.quantity > 0
-        ORDER BY
-            i.quantity DESC
-        LIMIT 10
-    """)
+    query = """
+    SELECT
+        r.retailer_id,
+        r.agency_name,
+        p.product_group AS product_name,
+        i.quantity,
+        r.latitude,
+        r.longitude
+    FROM retailers r
+    JOIN inventory i
+        ON r.retailer_id = i.retailer_id
+    JOIN products p
+        ON i.product_id = p.id
+    WHERE r.district = :district
+    """
+
+    params = {
+        "district": district,
+    }
+
+    if product != "All":
+        query += """
+        AND p.product_group = :product
+        """
+        params["product"] = product
+
+    query += """
+    ORDER BY i.quantity DESC
+    LIMIT 10
+    """
 
     with engine.connect() as conn:
-        result = conn.execute(
-            query,
-            {
-                "district": district,
-                "product": product,
-            },
-        )
-
-    rows = result.mappings().all()
+        rows = conn.execute(text(query), params).mappings().all()
 
     return [
-        RetailerResult(
-            retailer_id=row["retailer_id"],
-            agency_name=row["agency_name"],
-            product_name=row["product_name"],
-            quantity=float(row["quantity"]),
-            latitude=row["latitude"],
-            longitude=row["longitude"],
-        )
+        RetailerResult.model_validate(row)
         for row in rows
     ]
 
+
 def nearby_retailers(
-    latitude,
-    longitude,
-    radius_km,
-    product,
+    latitude: float,
+    longitude: float,
+    radius_km: float,
+    product: str,
 ):
-    query = text("""
-            SELECT
-            retailer_id,
-            agency_name,
-            product_name,
-            quantity,
-            latitude,
-            longitude
-        FROM retailer_stock
-        WHERE product_name = %s
-        AND (
+    query = """
+    SELECT
+        r.retailer_id,
+        r.agency_name,
+        p.product_group AS product_name,
+        i.quantity,
+        r.latitude,
+        r.longitude,
+        (
             6371 * acos(
-                cos(radians(%s))
-                * cos(radians(latitude))
-                * cos(radians(longitude) - radians(%s))
-                + sin(radians(%s))
-                * sin(radians(latitude))
+                cos(radians(:lat))
+                * cos(radians(r.latitude))
+                * cos(radians(r.longitude) - radians(:lon))
+                + sin(radians(:lat))
+                * sin(radians(r.latitude))
             )
-        ) <= %s
-        LIMIT 10;
-                 """)
+        ) AS distance
+
+    FROM retailers r
+    JOIN inventory i
+        ON r.retailer_id = i.retailer_id
+    JOIN products p
+        ON i.product_id = p.id
+
+    WHERE (
+        6371 * acos(
+            cos(radians(:lat))
+            * cos(radians(r.latitude))
+            * cos(radians(r.longitude) - radians(:lon))
+            + sin(radians(:lat))
+            * sin(radians(r.latitude))
+        )
+    ) <= :radius
+    """
+
+    params = {
+        "lat": latitude,
+        "lon": longitude,
+        "radius": radius_km,
+    }
+
+    if product != "All":
+        query += """
+        AND p.product_group = :product
+        """
+        params["product"] = product
+
+    query += """
+    ORDER BY distance ASC
+    LIMIT 10
+    """
+
+    with engine.connect() as conn:
+        rows = conn.execute(text(query), params).mappings().all()
+
+    return [
+        RetailerResult.model_validate(row)
+        for row in rows
+    ]

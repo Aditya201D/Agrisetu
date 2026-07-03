@@ -13,6 +13,10 @@ export default function ChatInput({ onSend, disabled = false }: Props) {
 
         if (!text.trim()) return;
 
+        if (text === "__location__") {
+            return;
+        }
+
         onSend(text);
 
         setText("");
