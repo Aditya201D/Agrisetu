@@ -1,5 +1,6 @@
 from rapidfuzz import process, fuzz
 from database.queries import get_all_districts
+from state_machine.states import State
 
 DISTRICTS = get_all_districts()
 
@@ -129,3 +130,27 @@ def normalize_district(message: str):
 
     return district if score >= 80 else message
 
+def normalize_message(state: State, message: str):
+    if not message.strip():
+        return message
+
+    if state == State.ASK_SEARCH_MODE:
+        return normalize_search_mode(message)
+
+    if state == State.ASK_PRODUCT:
+        return normalize_product(message)
+
+    if state == State.POST_RESULTS:
+        return normalize_post_results(message)
+
+    if state == State.ASK_DISTRICT:
+        return normalize_district(message)
+    
+    normalized = ...
+    original = message
+
+    if normalized != message:
+        print(f"[RapidFuzz] '{original}' -> '{normalized}'")
+        return normalized
+
+    return message

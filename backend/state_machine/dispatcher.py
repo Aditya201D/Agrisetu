@@ -1,4 +1,5 @@
 from state_machine.states import State
+from nlp.matcher import normalize_message
 from state_machine.ui_text import MENU_MAP
 
 from state_machine.handlers.auth import auth_handler
@@ -32,6 +33,7 @@ INTERNAL_STATES = {
 
 def process_message(session, message):
     while True:
+        message = normalize_message(session.state, message)
         handler = HANDLERS[session.state]
         reply = handler(session, message)
         # Handler generated a complete response
@@ -43,3 +45,4 @@ def process_message(session, message):
             continue
         # Waiting for user input
         return MENU_MAP[session.state]
+
