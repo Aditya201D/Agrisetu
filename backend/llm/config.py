@@ -1,0 +1,3 @@
+MODEL_NAME = "qwen2.5:1.5b"
+TEMPERATURE = 0
+TOP_P = 0.1
