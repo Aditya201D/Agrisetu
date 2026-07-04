@@ -6,6 +6,8 @@ from schemas.chat_response import ChatResponse
 from services.session_store import get_session
 from state_machine.dispatcher import process_message, INTERNAL_STATES
 
+from llm.preprocessor import preprocess
+
 router = APIRouter()
 
 class ChatRequest(BaseModel):
@@ -15,8 +17,9 @@ class ChatRequest(BaseModel):
 @router.post("/chat")
 def chat(request: ChatRequest):
     session = get_session(request.user_id)
+    intent = preprocess(session, request.message)
     reply = process_message(
-        session, request.message
+        session, request.message, intent
     )
 
     options = []

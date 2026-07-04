@@ -31,7 +31,7 @@ INTERNAL_STATES = {
     State.NO_RESULTS
 }
 
-def process_message(session, message):
+def process_message(session, message, intent=None):
     while True:
         message = normalize_message(session.state, message)
         handler = HANDLERS[session.state]
