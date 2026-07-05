@@ -8,12 +8,28 @@ from database.users import (
     get_user_by_username,
 )
 
+from auth.hashing import (
+    hash_password,
+    verify_password,
+)
+
+from database.users import (
+    create_user,
+    get_user_by_email,
+    get_user_by_username,
+    get_user_by_username_or_email,
+)
+
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 class RegisterRequest(BaseModel):
     username: str
     email: str
+    password: str
+
+class LoginRequest(BaseModel):
+    identifier: str
     password: str
 
 
@@ -45,4 +61,36 @@ def register(request: RegisterRequest):
     return {
         "success": True,
         "message": "Registration successful.",
+    }
+
+@router.post("/login")
+def login(request: LoginRequest):
+
+    user = get_user_by_username_or_email(
+        request.identifier
+    )
+
+    if user is None:
+        return {
+            "success": False,
+            "message": "Invalid username/email or password.",
+        }
+
+    if not verify_password(
+        request.password,
+        user["password_hash"],
+    ):
+        return {
+            "success": False,
+            "message": "Invalid username/email or password.",
+        }
+
+    return {
+        "success": True,
+        "message": "Login successful.",
+        "user": {
+            "id": user["id"],
+            "username": user["username"],
+            "email": user["email"],
+        },
     }

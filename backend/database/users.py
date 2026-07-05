@@ -63,3 +63,18 @@ def create_user(
                 "password_hash": password_hash,
             },
         )
+
+def get_user_by_username_or_email(identifier: str):
+
+    query = text("""
+        SELECT *
+        FROM users
+        WHERE username = :identifier
+           OR email = :identifier
+    """)
+
+    with engine.connect() as conn:
+        return conn.execute(
+            query,
+            {"identifier": identifier},
+        ).mappings().first()
