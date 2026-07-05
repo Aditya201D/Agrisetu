@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from auth.hashing import hash_password
+from auth.jwt_handler import create_access_token
 from database.users import (
     create_user,
     get_user_by_email,
@@ -85,12 +86,34 @@ def login(request: LoginRequest):
             "message": "Invalid username/email or password.",
         }
 
+    token = create_access_token(
+        user["id"]
+    )
+
     return {
         "success": True,
         "message": "Login successful.",
+        "access_token": token,
+        "token_type": "Bearer",
         "user": {
             "id": user["id"],
             "username": user["username"],
             "email": user["email"],
         },
+    }
+
+from auth.jwt_handler import verify_access_token
+@router.get("/verify")
+def verify(token: str):
+
+    user_id = verify_access_token(token)
+
+    if user_id is None:
+        return {
+            "valid": False,
+        }
+
+    return {
+        "valid": True,
+        "user_id": user_id,
     }
