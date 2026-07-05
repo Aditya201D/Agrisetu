@@ -4,9 +4,8 @@ import { useAuth } from "../context/AuthContext";
 
 import { useNavigate } from "react-router-dom";
 
-const navigate = useNavigate();
-
 export default function Login() {
+    const navigate = useNavigate();
     const { login, user } = useAuth();
 
     const [identifier, setIdentifier] = useState("");

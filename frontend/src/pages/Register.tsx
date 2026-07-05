@@ -2,9 +2,8 @@ import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const navigate = useNavigate();
-
 export default function Register() {
+    const navigate = useNavigate();
     const { register, user } = useAuth();
 
     const [username, setUsername] = useState("");
