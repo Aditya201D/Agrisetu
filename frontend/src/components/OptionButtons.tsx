@@ -1,10 +1,12 @@
 interface Props {
     options: string[];
     onSelect: (value: string) => void;
+    showLocationButton?: boolean;
+    onCurrentLocation?: () => void;
 }
 
-export default function OptionButtons({ options, onSelect }: Props) {
-    if (!options.length) return null;
+export default function OptionButtons({ options, onSelect, showLocationButton = false, onCurrentLocation }: Props) {
+    if (!options.length && !showLocationButton) return null;
 
     return (
         <div className="flex flex-wrap gap-2 mt-2">
@@ -17,6 +19,15 @@ export default function OptionButtons({ options, onSelect }: Props) {
                     {option}
                 </button>
             ))}
+
+            {showLocationButton && (
+                <button
+                    onClick={onCurrentLocation}
+                    className="px-4 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700"
+                >
+                    📍 Use Current Location
+                </button>
+            )}
         </div>
     );
 }

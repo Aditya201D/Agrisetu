@@ -64,21 +64,29 @@ export default function App() {
         }
     }
 
-    useEffect(() => {
-        handleSend("");
-    }, []);
-
-    useEffect(() => {
-        async function sendLocation() {
-            if (session?.state !== "ASK_LOCATION") return;
+    async function handleCurrentLocation() {
+        try {
+            setLoading(true);
 
             const location = await getCurrentLocation();
 
-            handleSend(location);
+            await handleSend(location);
+        } catch {
+            setMessages(prev => [
+                ...prev,
+                {
+                    sender: "bot",
+                    text: "Unable to read your location. You can also enter coordinates manually.",
+                },
+            ]);
+        } finally {
+            setLoading(false);
         }
+    }
 
-        sendLocation();
-    }, [session]);
+    useEffect(() => {
+        handleSend("");
+    }, []);
 
     return (
         <div className="h-screen flex flex-col">
@@ -88,7 +96,12 @@ export default function App() {
                 retailers={session?.last_results ?? []}
                 showRetailers={session?.state === "POST_RESULTS"}
             />
-            <OptionButtons options={options} onSelect={handleSend} />
+            <OptionButtons
+                options={options}
+                onSelect={handleSend}
+                showLocationButton={session?.state === "ASK_LOCATION"}
+                onCurrentLocation={handleCurrentLocation}
+            />
             <ChatInput onSend={handleSend} loading={loading} />
             <SessionDebug session={session} />
         </div>

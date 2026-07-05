@@ -16,6 +16,12 @@ def search_mode_handler(session, message):
         session.search_mode = "near_me"
         session.state = State.ASK_LOCATION
 
-        return "Please share your location."
+        return (
+        "How would you like to provide your location?\n\n"
+        "• Click '📍 Use Current Location'\n"
+        "• Or enter coordinates manually.\n\n"
+        "Example:\n"
+        "25.3400,82.8000"
+    )
 
     return SEARCH_MODE_MENU
