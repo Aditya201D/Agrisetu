@@ -122,6 +122,8 @@ def normalize_post_results(message: str):
     )
 
 def normalize_district(message: str) -> MatchResult:
+    message = message.strip()
+
     match = process.extractOne(
         message,
         DISTRICTS,

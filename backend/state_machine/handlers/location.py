@@ -10,8 +10,10 @@ def location_handler(session: Session, message):
         session.longitude = lon
         session.radius_km = SEARCH_RADIUS_KM
 
-        session.state = State.ASK_PRODUCT
-
+        if session.product_group:
+            session.state = State.QUERY_DB
+        else:
+            session.state = State.ASK_PRODUCT
         return None
     
     except Exception:

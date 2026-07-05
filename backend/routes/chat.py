@@ -17,7 +17,25 @@ class ChatRequest(BaseModel):
 @router.post("/chat")
 def chat(request: ChatRequest):
     session = get_session(request.user_id)
-    intent = preprocess(session, request.message)
+    intent = None
+
+    simple_inputs = {
+        "1",
+        "2",
+        "district",
+        "by district",
+        "near me",
+        "nearby",
+    }
+
+    if (
+        session.state == State.ASK_SEARCH_MODE
+        and request.message.lower().strip() not in simple_inputs
+    ):
+        intent = preprocess(session, request.message)
+    else:
+        intent = None
+
     reply = process_message(
         session, request.message, intent
     )

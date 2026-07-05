@@ -6,10 +6,17 @@ def show_retailers_handler(session, message):
 
     session.state = State.POST_RESULTS
 
+    location = (
+        session.district_name
+        if session.search_mode == "district"
+        else "near your location"
+    )
+
     return (
         f"Found {count} retailers stocking "
         f"{session.product_group} "
-        f"in {session.district_name}.\n\n"
+        f"{'in' if session.search_mode == 'district' else ''} "
+        f"{location}.\n\n"
         "See the table below.\n\n"
         "--------------------------------\n"
         "What would you like to do next?\n\n"

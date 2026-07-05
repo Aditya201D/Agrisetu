@@ -28,21 +28,38 @@ INTERNAL_STATES = {
     State.AUTH_CHECK,
     State.QUERY_DB,
     State.SHOW_RETAILERS,
-    State.NO_RESULTS
+    State.NO_RESULTS,
 }
+
 
 def process_message(session, message, intent=None):
     while True:
         message = normalize_message(session.state, message)
+
+        if session.state == State.ASK_SEARCH_MODE and intent is not None:
+
+            #district search
+            if session.search_mode == "district":
+                if session.district_name:
+                    if session.product_group:
+                        session.state = State.QUERY_DB
+                    else:
+                        session.state = State.ASK_PRODUCT
+                else:
+                    session.state = State.ASK_DISTRICT
+
+            #near me search
+            elif session.search_mode == "near_me":
+                session.state = State.ASK_LOCATION
+
         handler = HANDLERS[session.state]
         reply = handler(session, message)
-        # Handler generated a complete response
+
         if reply is not None:
             return reply
-        # Continue automatic states
+
         if session.state in INTERNAL_STATES:
             message = ""
             continue
-        # Waiting for user input
-        return MENU_MAP[session.state]
 
+        return MENU_MAP[session.state]
