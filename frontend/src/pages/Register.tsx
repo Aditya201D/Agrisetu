@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+
+const navigate = useNavigate();
 
 export default function Register() {
     const { register, user } = useAuth();
@@ -21,7 +23,7 @@ export default function Register() {
         const success = await register(username, email, password);
 
         if (success) {
-            setMessage("Registration successful. You can now login.");
+            navigate("/login");
         } else {
             setMessage("Registration failed.");
         }

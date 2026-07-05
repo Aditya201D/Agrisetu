@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+import { useNavigate } from "react-router-dom";
+
+const navigate = useNavigate();
+
 export default function Login() {
     const { login, user } = useAuth();
 
@@ -20,7 +24,9 @@ export default function Login() {
 
         const success = await login(identifier, password);
 
-        if (!success) {
+        if (success) {
+            navigate("/");
+        } else {
             setError("Invalid username/email or password.");
         }
     }
