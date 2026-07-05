@@ -78,3 +78,21 @@ def get_user_by_username_or_email(identifier: str):
             query,
             {"identifier": identifier},
         ).mappings().first()
+    
+def get_user_by_id(user_id: int):
+    query = """
+    SELECT
+        id,
+        username,
+        email
+    FROM users
+    WHERE id = :id
+    """
+
+    with engine.connect() as conn:
+        row = conn.execute(
+            text(query),
+            {"id": user_id},
+        ).mappings().first()
+
+    return row

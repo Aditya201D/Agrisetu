@@ -7,6 +7,7 @@ from database.users import (
     create_user,
     get_user_by_email,
     get_user_by_username,
+    get_user_by_id,
 )
 
 from auth.hashing import (
@@ -113,7 +114,18 @@ def verify(token: str):
             "valid": False,
         }
 
+    user = get_user_by_id(user_id)
+
+    if user is None:
+        return {
+            "valid": False,
+        }
+
     return {
         "valid": True,
-        "user_id": user_id,
+        "user": {
+            "id": user["id"],
+            "username": user["username"],
+            "email": user["email"],
+        },
     }

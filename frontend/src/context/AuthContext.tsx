@@ -38,11 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const result = await verifyToken(token);
 
             if (result.valid) {
-                setUser({
-                    id: result.user_id,
-                    username: "",
-                    email: "",
-                });
+                setUser(result.user);
             } else {
                 localStorage.removeItem("access_token");
             }
