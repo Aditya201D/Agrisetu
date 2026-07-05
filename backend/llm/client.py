@@ -20,6 +20,12 @@ def ask_llm(message: str):
             },
         ],
         format=Intent.model_json_schema(),
+        stream=False,
+        keep_alive="30m",
+        options={
+            "temperature": 0,
+            "num_predict": 80,
+        },
     )
 
     return response.message.content
