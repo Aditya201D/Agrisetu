@@ -1,9 +1,9 @@
-import ChatWindow from "../components/ChatWindow.tsx";
-import Header from "../components/Header.tsx";
+import ChatWindow from "../components/ChatWindow";
+import Header from "../components/Header";
 
 export default function ChatPage() {
     return (
-        <div className="h-screen flex flex-col bg-gray-100">
+        <div className="h-screen flex flex-col">
             <Header />
             <ChatWindow />
         </div>
