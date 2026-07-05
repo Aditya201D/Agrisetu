@@ -19,9 +19,13 @@ def query_db_handler(session, message):
                 session.product_group,
             )
 
+            print(f"Radius {radius}: {len(retailers)} retailers")
+
             if retailers:
                 session.radius_km = radius
                 break
+        if not retailers:
+            session.radius_km = 50
 
     session.last_results = retailers
 
