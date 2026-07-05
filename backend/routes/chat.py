@@ -1,6 +1,9 @@
 from fastapi import APIRouter
-from state_machine.states import State
+from fastapi import Depends
+from auth.dependencies import get_current_user
 from pydantic import BaseModel
+
+from state_machine.states import State
 from schemas.chat_response import ChatResponse
 
 import time
@@ -13,30 +16,18 @@ from llm.preprocessor import preprocess
 router = APIRouter()
 
 class ChatRequest(BaseModel):
-    user_id: str
     message: str
 
 @router.post("/chat")
-def chat(request: ChatRequest):
+def chat(request: ChatRequest, user_id: int = Depends(get_current_user)):
 
     total = time.perf_counter()
 
-    session = get_session(request.user_id)
+    session = get_session(str(user_id))
     intent = None
 
-    simple_inputs = {
-        "1",
-        "2",
-        "district",
-        "by district",
-        "near me",
-        "nearby",
-    }
+    if request.message.strip():
 
-    if (
-        session.state == State.ASK_SEARCH_MODE
-        and request.message.lower().strip() not in simple_inputs
-    ):
         intent = preprocess(session, request.message)
 
         if intent is not None and not intent.in_domain:
@@ -48,12 +39,18 @@ def chat(request: ChatRequest):
                 session=session,
                 options=get_options(session.state),
             )
-    else:
-        intent = None
+        
+    print("Intent:", intent)
+    print("Session state:", session.state)
+    print("Search mode:", session.search_mode)
+    print("District:", session.district_name)
+    print("Product:", session.product_group)
 
     reply = process_message(
         session, request.message, intent
     )
+
+    print("State after dispatcher:", session.state)
 
     options = get_options(session.state)
     

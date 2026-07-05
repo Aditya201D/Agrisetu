@@ -10,6 +10,10 @@ SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 ALGORITHM = os.getenv("JWT_ALGORITHM")
 EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", 60))
 
+print("SECRET:", SECRET_KEY)
+print("ALGORITHM:", ALGORITHM)
+print("EXPIRE:", EXPIRE_MINUTES)
+
 
 def create_access_token(user_id: int):
 
@@ -30,7 +34,6 @@ def create_access_token(user_id: int):
 
 
 def verify_access_token(token: str):
-
     try:
         payload = jwt.decode(
             token,
@@ -38,7 +41,10 @@ def verify_access_token(token: str):
             algorithms=[ALGORITHM],
         )
 
+        print(payload)
+
         return int(payload["sub"])
 
-    except JWTError:
+    except Exception as e:
+        print("JWT ERROR:", repr(e))
         return None

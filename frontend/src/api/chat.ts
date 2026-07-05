@@ -5,9 +5,19 @@ const api = axios.create({
     baseURL: "http://localhost:8000",
 });
 
-export async function sendMessage(userId: string, message: string): Promise<ChatResponse> {
+// Automatically attach JWT to every request
+api.interceptors.request.use(config => {
+    const token = localStorage.getItem("access_token");
+
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+});
+
+export async function sendMessage(message: string): Promise<ChatResponse> {
     const response = await api.post("/chat", {
-        user_id: userId,
         message,
     });
 

@@ -33,33 +33,53 @@ INTERNAL_STATES = {
 
 
 def process_message(session, message, intent=None):
+
     while True:
-        message = normalize_message(session.state, message)
+
+        print("LOOP START:", session.state)
 
         if session.state == State.ASK_SEARCH_MODE and intent is not None:
 
-            #district search
+            print("Processing intent")
+
             if session.search_mode == "district":
+
                 if session.district_name:
+
                     if session.product_group:
+                        print("-> QUERY_DB")
                         session.state = State.QUERY_DB
                     else:
+                        print("-> ASK_PRODUCT")
                         session.state = State.ASK_PRODUCT
+
                 else:
+                    print("-> ASK_DISTRICT")
                     session.state = State.ASK_DISTRICT
 
-            #near me search
-            elif session.search_mode == "near_me":
-                session.state = State.ASK_LOCATION
+                continue
 
-        handler = HANDLERS[session.state]
+            elif session.search_mode == "near_me":
+                print("-> ASK_LOCATION")
+                session.state = State.ASK_LOCATION
+                continue
+
+        message = normalize_message(session.state, message)
+
+        print("Calling handler:", session.state)
+
+        current_state = session.state
+
+        handler = HANDLERS[current_state]
         reply = handler(session, message)
 
         if reply is not None:
             return reply
 
-        if session.state in INTERNAL_STATES:
+        if current_state in INTERNAL_STATES:
             message = ""
             continue
+
+        print("RETURN MENU:", session.state)
 
         return MENU_MAP[session.state]

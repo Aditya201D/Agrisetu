@@ -13,8 +13,6 @@ import type { Message, Session } from "./types/chat";
 import { getCurrentLocation } from "./services/geolocation";
 
 export default function App() {
-    const USER_ID = "user1";
-
     const [messages, setMessages] = useState<Message[]>([]);
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(false);
@@ -35,7 +33,7 @@ export default function App() {
         setLoading(true);
 
         try {
-            const response = await sendMessage(USER_ID, text);
+            const response = await sendMessage(text);
 
             if (response.reply.trim()) {
                 setMessages(prev => [
