@@ -12,17 +12,16 @@ def preprocess(session, message):
         session.search_mode = intent.search_mode
 
     if intent.district_name:
-        session.district_name = normalize_district(
-            intent.district_name
-        ).value
+        district = normalize_district(intent.district_name)
+
+        if district.score >= 80:
+            session.district_name = district.value
 
     if intent.product_group:
         product = normalize_product(intent.product_group)
 
-        if hasattr(product, "value"):
+        if product.score >= 85:
             session.product_group = product.value
-        else:
-            session.product_group = product
 
     if intent.post_results_choice:
         session.post_results_choice = intent.post_results_choice
