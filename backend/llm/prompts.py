@@ -23,6 +23,7 @@ Rules
 
 - Extract only what the user actually provides.
 - If something is missing, return null.
+- If the user's message is unrelated to fertilizer retailer search, return "in_domain": false.
 - Correct obvious spelling mistakes whenever possible.
 - "fertilizer" and "fertiliser" mean product_group = "All".
 - "nearby", "closest", "around me", "my location" all mean search_mode = "near_me".
@@ -176,4 +177,58 @@ Output:
     "post_results_choice":"4",
     "confidence":0.99
 }
+
+User:
+I want to buy a car
+
+Output:
+{
+    "search_mode": null,
+    "district_name": null,
+    "product_group": null,
+    "post_results_choice": null,
+    "in_domain": false,
+    "confidence": 0.99
+}
+
+User:
+Tell me today's weather
+
+Output:
+{
+    "search_mode": null,
+    "district_name": null,
+    "product_group": null,
+    "post_results_choice": null,
+    "in_domain": false,
+    "confidence": 0.99
+}
+
+User:
+Who is the Prime Minister?
+
+Output:
+{
+    "search_mode": null,
+    "district_name": null,
+    "product_group": null,
+    "post_results_choice": null,
+    "in_domain": false,
+    "confidence": 0.99
+}
+
+User:
+Write a Python program
+
+Output:
+{
+    "search_mode": null,
+    "district_name": null,
+    "product_group": null,
+    "post_results_choice": null,
+    "in_domain": false,
+    "confidence": 0.99
+}
+
+
 """

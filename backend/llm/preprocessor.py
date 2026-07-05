@@ -7,6 +7,9 @@ def preprocess(session, message):
 
     if intent is None:
         return None
+    
+    if not intent.in_domain:
+        return intent
 
     if intent.search_mode:
         session.search_mode = intent.search_mode

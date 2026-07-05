@@ -38,6 +38,16 @@ def chat(request: ChatRequest):
         and request.message.lower().strip() not in simple_inputs
     ):
         intent = preprocess(session, request.message)
+
+        if intent is not None and not intent.in_domain:
+            return ChatResponse(
+                reply=(
+                    "I'm designed to help users find fertilizer retailers.\n\n"
+                    "Please choose one of the available options below."
+                ),
+                session=session,
+                options=get_options(session.state),
+            )
     else:
         intent = None
 
@@ -45,15 +55,26 @@ def chat(request: ChatRequest):
         session, request.message, intent
     )
 
-    options = []
-    if session.state == State.ASK_SEARCH_MODE:
-        options = [
+    options = get_options(session.state)
+    
+    while session.state in INTERNAL_STATES:
+        reply = process_message(session, "")    #empty string ensures that no input is required
+
+    return ChatResponse(
+        reply=reply,
+        session=session,
+        options=options,
+    )
+
+def get_options(state: State):
+    if state == State.ASK_SEARCH_MODE:
+        return [
             "By District",
             "Near Me",
         ]
 
-    elif session.state == State.ASK_PRODUCT:
-        options = [
+    if state == State.ASK_PRODUCT:
+        return [
             "Urea",
             "DAP",
             "NPKs",
@@ -63,21 +84,12 @@ def chat(request: ChatRequest):
             "All",
         ]
 
-    elif session.state == State.POST_RESULTS:
-        options = [
+    if state == State.POST_RESULTS:
+        return [
             "New Search",
             "Change Product",
             "Change Area",
             "Done",
         ]
-    
-    while session.state in INTERNAL_STATES:
-        reply = process_message(session, "")
-        
-    print(f"[TOTAL] {time.perf_counter()-total:.2f}s")    #empty string ensures that no input is required
 
-    return ChatResponse(
-        reply=reply,
-        session=session,
-        options=options,
-    )
+    return []

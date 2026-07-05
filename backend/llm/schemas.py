@@ -24,3 +24,5 @@ class Intent(BaseModel):
     ] | None = None
 
     confidence: float = 0.0
+
+    in_domain: bool = True
