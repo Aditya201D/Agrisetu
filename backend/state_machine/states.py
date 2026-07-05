@@ -1,7 +1,6 @@
 from enum import Enum
 
 class State(str, Enum):
-    AUTH_CHECK = "AUTH_CHECK"
     ASK_SEARCH_MODE = "ASK_SEARCH_MODE"
     ASK_DISTRICT = "ASK_DISTRICT"
     ASK_LOCATION = "ASK_LOCATION"

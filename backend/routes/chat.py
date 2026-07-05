@@ -1,34 +1,67 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from auth.dependencies import get_current_user
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from state_machine.states import State
+from auth.dependencies import get_current_user
+from llm.preprocessor import preprocess
 from schemas.chat_response import ChatResponse
-
-import time
-
 from services.session_store import get_session
 from state_machine.dispatcher import process_message, INTERNAL_STATES
-
-from llm.preprocessor import preprocess
+from state_machine.states import State
 
 router = APIRouter()
+
 
 class ChatRequest(BaseModel):
     message: str
 
+
 @router.post("/chat")
-def chat(request: ChatRequest, user_id: int = Depends(get_current_user)):
-
-    total = time.perf_counter()
-
+def chat(
+    request: ChatRequest,
+    user_id: int = Depends(get_current_user),
+):
     session = get_session(str(user_id))
     intent = None
 
-    if request.message.strip():
+    message = request.message.strip()
+    message_lower = message.lower()
 
-        intent = preprocess(session, request.message)
+    # Only these states benefit from natural-language understanding.
+    LLM_STATES = {
+        State.ASK_SEARCH_MODE,
+        State.POST_RESULTS,
+    }
+
+    # Inputs that don't require an LLM.
+    SIMPLE_INPUTS = {
+        State.ASK_SEARCH_MODE: {
+            "1",
+            "2",
+            "district",
+            "by district",
+            "near me",
+            "nearby",
+        },
+        State.POST_RESULTS: {
+            "1",
+            "2",
+            "3",
+            "4",
+            "new search",
+            "change product",
+            "change area",
+            "done",
+        },
+    }
+
+    use_llm = (
+        message
+        and session.state in LLM_STATES
+        and message_lower not in SIMPLE_INPUTS.get(session.state, set())
+    )
+
+    if use_llm:
+        intent = preprocess(session, message)
 
         if intent is not None and not intent.in_domain:
             return ChatResponse(
@@ -39,29 +72,22 @@ def chat(request: ChatRequest, user_id: int = Depends(get_current_user)):
                 session=session,
                 options=get_options(session.state),
             )
-        
-    print("Intent:", intent)
-    print("Session state:", session.state)
-    print("Search mode:", session.search_mode)
-    print("District:", session.district_name)
-    print("Product:", session.product_group)
 
     reply = process_message(
-        session, request.message, intent
+        session,
+        message,
+        intent,
     )
 
-    print("State after dispatcher:", session.state)
-
-    options = get_options(session.state)
-    
     while session.state in INTERNAL_STATES:
-        reply = process_message(session, "")    #empty string ensures that no input is required
+        reply = process_message(session, "")
 
     return ChatResponse(
         reply=reply,
         session=session,
-        options=options,
+        options=get_options(session.state),
     )
+
 
 def get_options(state: State):
     if state == State.ASK_SEARCH_MODE:
