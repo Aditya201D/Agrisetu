@@ -1,3 +1,4 @@
+import time
 from sqlalchemy import text
 from database.connection import engine
 from schemas.retailer import RetailerResult
@@ -38,8 +39,13 @@ def get_retailers_by_district_and_product(
     LIMIT 10
     """
 
+    start = time.perf_counter()
+
     with engine.connect() as conn:
         rows = conn.execute(text(query), params).mappings().all()
+
+    db_time = time.perf_counter() - start
+    print(f"[DB] {db_time:.4f}s")
 
     return [
         RetailerResult.model_validate(row)
@@ -105,8 +111,13 @@ def nearby_retailers(
     LIMIT 10
     """
 
+    start = time.perf_counter()
+
     with engine.connect() as conn:
         rows = conn.execute(text(query), params).mappings().all()
+
+    db_time = time.perf_counter() - start
+    print(f"[DB] {db_time:.4f}s")
 
     return [
         RetailerResult.model_validate(row)

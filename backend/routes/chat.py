@@ -3,6 +3,8 @@ from state_machine.states import State
 from pydantic import BaseModel
 from schemas.chat_response import ChatResponse
 
+import time
+
 from services.session_store import get_session
 from state_machine.dispatcher import process_message, INTERNAL_STATES
 
@@ -16,6 +18,9 @@ class ChatRequest(BaseModel):
 
 @router.post("/chat")
 def chat(request: ChatRequest):
+
+    total = time.perf_counter()
+
     session = get_session(request.user_id)
     intent = None
 
@@ -67,7 +72,9 @@ def chat(request: ChatRequest):
         ]
     
     while session.state in INTERNAL_STATES:
-        reply = process_message(session, "")    #empty string ensures that no input is required
+        reply = process_message(session, "")
+        
+    print(f"[TOTAL] {time.perf_counter()-total:.2f}s")    #empty string ensures that no input is required
 
     return ChatResponse(
         reply=reply,
