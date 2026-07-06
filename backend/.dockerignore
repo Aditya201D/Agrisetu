@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.pytest_cache/
+
+.venv/
+
+tests/
+
+Retailer Stock Sample data(1).xlsx

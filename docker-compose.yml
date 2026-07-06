@@ -1,0 +1,26 @@
+services:
+    backend:
+        build:
+            context: .
+            dockerfile: backend/Dockerfile
+
+        container_name: agrisetu-backend
+
+        env_file:
+            - backend/.env
+
+        network_mode: host
+
+        restart: unless-stopped
+
+    frontend:
+        build:
+            context: ./frontend
+
+        container_name: agrisetu-frontend
+
+        ports:
+            - "5173:80"
+
+        depends_on:
+            - backend

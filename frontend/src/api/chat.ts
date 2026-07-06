@@ -2,7 +2,7 @@ import axios from "axios";
 import type { ChatResponse, Message } from "../types/chat";
 
 const api = axios.create({
-    baseURL: "http://localhost:8000",
+    baseURL: import.meta.env.VITE_API_URL,
 });
 
 // Automatically attach JWT to every request
