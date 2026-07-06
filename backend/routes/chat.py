@@ -14,6 +14,8 @@ from services.session_store import (
 from database.conversations import (
     create_conversation,
     touch_conversation,
+    get_conversation,
+    update_title
 )
 from database.chat_history import save_message
 from database.chat_history import get_history
@@ -96,6 +98,20 @@ def chat(
             "user",
             message,
         )
+
+        conversation = get_conversation(session.conversation_id)
+
+        if (
+            conversation is not None
+            and conversation["title"] == "New Chat"
+        ):
+            title = message[:40].strip()
+
+            if title:
+                update_title(
+                    session.conversation_id,
+                    title,
+                )
 
     reply = process_message(
         session,
