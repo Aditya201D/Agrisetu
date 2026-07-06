@@ -96,7 +96,8 @@ def chat(
     while session.state in INTERNAL_STATES:
         reply = process_message(session, "")
 
-    save_message(user_id, "bot", reply)
+    if reply.strip():
+        save_message(user_id, "bot", reply)
 
     save_session(
         str(user_id),

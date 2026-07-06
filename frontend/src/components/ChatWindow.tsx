@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { sendMessage } from "../api/chat";
+import { getHistory } from "../api/history";
 import { getCurrentLocation } from "../services/geolocation";
 
 import ChatContainer from "./ChatContainer";
@@ -20,13 +21,15 @@ export default function ChatWindow() {
         setOptions([]);
         if (loading) return;
 
-        setMessages(prev => [
-            ...prev,
-            {
-                sender: "user",
-                text,
-            },
-        ]);
+        if (text.trim()) {
+            setMessages(prev => [
+                ...prev,
+                {
+                    sender: "user",
+                    text,
+                },
+            ]);
+        }
 
         setLoading(true);
 
@@ -81,7 +84,30 @@ export default function ChatWindow() {
     }
 
     useEffect(() => {
-        handleSend("");
+        async function initialize() {
+            try {
+                const history = await getHistory();
+
+                if (history.length > 0) {
+                    setMessages(history);
+
+                    // Fetch the current session state without adding a visible message.
+                    const response = await sendMessage("");
+
+                    setSession(response.session);
+                    setOptions(response.options);
+                } else {
+                    await handleSend("");
+                }
+            } catch (error) {
+                console.error(error);
+
+                // Fall back to normal initialization.
+                await handleSend("");
+            }
+        }
+
+        initialize();
     }, []);
 
     return (
