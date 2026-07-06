@@ -34,7 +34,7 @@ def post_results_handler(session, message):
     if choice in ["4", "done"]:
         reset_session(session)
         session.state = State.ASK_SEARCH_MODE
-        return "Thank you for using AgriSetu!" + SEARCH_MODE_MENU
+        return "Thank you for using AgriSetu!\n\n" + SEARCH_MODE_MENU
     
     else:
         return (

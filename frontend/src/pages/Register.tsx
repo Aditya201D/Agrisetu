@@ -29,43 +29,74 @@ export default function Register() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <form onSubmit={handleSubmit} className="bg-white shadow rounded-xl p-8 w-96">
-                <h1 className="text-2xl font-bold mb-6 text-center">Register</h1>
+        <div className="min-h-screen bg-linear-to-br from-green-50 via-white to-gray-100 flex items-center justify-center px-6">
+            <div className="w-full max-w-110">
+                <div className="text-center mb-8">
+                    <div className="text-5xl mb-3">🌱</div>
 
-                <input
-                    className="border rounded w-full p-2 mb-4"
-                    placeholder="Username"
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
-                />
+                    <h1 className="text-4xl font-bold text-green-800">AgriSetu</h1>
 
-                <input
-                    className="border rounded w-full p-2 mb-4"
-                    placeholder="Email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                />
+                    <p className="mt-2 text-gray-600">Fertilizer Availability Assistant</p>
 
-                <input
-                    className="border rounded w-full p-2 mb-4"
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                />
+                    <p className="text-sm text-gray-500 mt-1">Government Fertilizer Retailer Search Portal</p>
+                </div>
 
-                {message && <p className="mb-4">{message}</p>}
+                <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl shadow-xl p-8">
+                    <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Create Account</h2>
 
-                <button className="w-full bg-green-600 text-white rounded p-2">Register</button>
+                    <div className="space-y-5">
+                        <input
+                            className="w-full rounded-xl border border-gray-300 px-4 py-3
+                            focus:outline-none focus:ring-2 focus:ring-green-600
+                            focus:border-green-600 transition"
+                            placeholder="Username"
+                            value={username}
+                            onChange={e => setUsername(e.target.value)}
+                        />
 
-                <p className="mt-4 text-center">
-                    Already have an account?{" "}
-                    <Link to="/login" className="text-green-700">
-                        Login
-                    </Link>
-                </p>
-            </form>
+                        <input
+                            className="w-full rounded-xl border border-gray-300 px-4 py-3
+                            focus:outline-none focus:ring-2 focus:ring-green-600
+                            focus:border-green-600 transition"
+                            placeholder="Email"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                        />
+
+                        <input
+                            className="w-full rounded-xl border border-gray-300 px-4 py-3
+                            focus:outline-none focus:ring-2 focus:ring-green-600
+                            focus:border-green-600 transition"
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                        />
+                    </div>
+
+                    {message && (
+                        <div className="mt-5 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                            {message}
+                        </div>
+                    )}
+
+                    <button
+                        className="mt-6 w-full rounded-xl bg-green-700 py-3 text-white
+                        font-semibold hover:bg-green-800 transition shadow-sm"
+                    >
+                        Register
+                    </button>
+
+                    <p className="mt-6 text-center text-gray-600">
+                        Already have an account?{" "}
+                        <Link to="/login" className="font-medium text-green-700 hover:underline">
+                            Login
+                        </Link>
+                    </p>
+                </form>
+
+                <p className="text-center text-xs text-gray-500 mt-6">© Government Fertilizer Availability Platform</p>
+            </div>
         </div>
     );
 }

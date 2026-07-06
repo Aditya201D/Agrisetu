@@ -7,7 +7,6 @@ import { getCurrentLocation } from "../services/geolocation";
 import ChatContainer from "./ChatContainer";
 import ChatInput from "./ChatInput";
 import OptionButtons from "./OptionButtons";
-import SessionDebug from "./SessionDebug";
 
 import type { Message, Session } from "../types/chat";
 
@@ -173,8 +172,6 @@ export default function ChatWindow({ selectedConversationId, newChatTrigger }: P
                 />
 
                 <ChatInput onSend={handleSend} loading={loading} />
-
-                <SessionDebug session={session} />
             </div>
         </main>
     );
