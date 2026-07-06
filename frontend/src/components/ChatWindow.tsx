@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { sendMessage } from "../api/chat";
-import { getHistory } from "../api/history";
+import { getConversationHistory, getHistory, newConversation } from "../api/history";
 import { getCurrentLocation } from "../services/geolocation";
 
 import ChatContainer from "./ChatContainer";
@@ -11,7 +11,12 @@ import SessionDebug from "./SessionDebug";
 
 import type { Message, Session } from "../types/chat";
 
-export default function ChatWindow() {
+interface Props {
+    selectedConversationId: number | null;
+    newChatTrigger: number;
+}
+
+export default function ChatWindow({ selectedConversationId, newChatTrigger }: Props) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(false);
@@ -19,6 +24,7 @@ export default function ChatWindow() {
 
     async function handleSend(text: string) {
         setOptions([]);
+
         if (loading) return;
 
         if (text.trim()) {
@@ -83,54 +89,92 @@ export default function ChatWindow() {
         }
     }
 
-    useEffect(() => {
-        async function initialize() {
-            try {
-                const history = await getHistory();
+    async function initializeCurrentConversation() {
+        try {
+            const history = await getHistory();
 
-                if (history.length > 0) {
-                    setMessages(history);
+            if (history.length > 0) {
+                setMessages(history);
 
-                    // Fetch the current session state without adding a visible message.
-                    const response = await sendMessage("");
+                const response = await sendMessage("");
 
-                    setSession(response.session);
-                    setOptions(response.options);
-                } else {
-                    await handleSend("");
-                }
-            } catch (error) {
-                console.error(error);
-
-                // Fall back to normal initialization.
+                setSession(response.session);
+                setOptions(response.options);
+            } else {
                 await handleSend("");
+            }
+        } catch (error) {
+            console.error(error);
+            await handleSend("");
+        }
+    }
+
+    useEffect(() => {
+        initializeCurrentConversation();
+    }, []);
+
+    // We'll activate this in the next step.
+    useEffect(() => {
+        async function loadConversation() {
+            if (selectedConversationId === null) return;
+
+            try {
+                const history = await getConversationHistory(selectedConversationId);
+
+                setMessages(history);
+
+                const response = await sendMessage("");
+
+                setSession(response.session);
+                setOptions(response.options);
+            } catch (err) {
+                console.error(err);
             }
         }
 
-        initialize();
-    }, []);
+        loadConversation();
+    }, [selectedConversationId]);
+
+    // We'll activate this in the next step.
+    useEffect(() => {
+        async function startNewChat() {
+            if (newChatTrigger === 0) return;
+
+            try {
+                await newConversation();
+
+                setMessages([]);
+                setOptions([]);
+                setSession(null);
+
+                await handleSend("");
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        startNewChat();
+    }, [newChatTrigger]);
 
     return (
         <main className="flex-1 overflow-y-auto p-6">
             <div className="max-w-4xl mx-auto">
-                <>
-                    <ChatContainer
-                        messages={messages}
-                        retailers={session?.last_results ?? []}
-                        showRetailers={session?.state === "POST_RESULTS"}
-                    />
+                <ChatContainer
+                    messages={messages}
+                    retailers={session?.last_results ?? []}
+                    showRetailers={session?.state === "POST_RESULTS"}
+                />
 
-                    <OptionButtons
-                        options={options}
-                        onSelect={handleSend}
-                        showLocationButton={session?.state === "ASK_LOCATION"}
-                        onCurrentLocation={handleCurrentLocation}
-                    />
+                <OptionButtons
+                    options={options}
+                    onSelect={handleSend}
+                    showLocationButton={session?.state === "ASK_LOCATION"}
+                    onCurrentLocation={handleCurrentLocation}
+                />
 
-                    <ChatInput onSend={handleSend} loading={loading} />
+                <ChatInput onSend={handleSend} loading={loading} />
 
-                    <SessionDebug session={session} />
-                </>
+                <SessionDebug session={session} />
             </div>
         </main>
     );

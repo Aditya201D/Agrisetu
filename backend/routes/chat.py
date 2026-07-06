@@ -96,7 +96,6 @@ def chat(
             "user",
             message,
         )
-        touch_conversation(session.conversation_id)
 
     reply = process_message(
         session,
@@ -112,14 +111,14 @@ def chat(
             session.conversation_id,
             user_id,
             "bot",
-            reply
+            reply,
         )
-        touch_conversation(session.conversation_id)
 
     save_session(
         str(user_id),
         session,
     )
+    touch_conversation(session.conversation_id)
 
     return ChatResponse(
         reply=reply,

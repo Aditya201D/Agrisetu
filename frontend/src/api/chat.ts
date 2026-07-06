@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { ChatResponse } from "../types/chat";
+import type { ChatResponse, Message } from "../types/chat";
 
 const api = axios.create({
     baseURL: "http://localhost:8000",
@@ -20,6 +20,33 @@ export async function sendMessage(message: string): Promise<ChatResponse> {
     const response = await api.post("/chat", {
         message,
     });
+
+    return response.data;
+}
+
+export interface Conversation {
+    id: number;
+    title: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export async function getConversations(): Promise<Conversation[]> {
+    const response = await api.get("/history/conversations");
+    return response.data;
+}
+
+export async function getConversation(conversationId: number): Promise<Message[]> {
+    const response = await api.get(`/history/${conversationId}`);
+
+    return response.data.map((msg: any) => ({
+        sender: msg.sender,
+        text: msg.message,
+    }));
+}
+
+export async function newConversation() {
+    const response = await api.post("/history/new");
 
     return response.data;
 }

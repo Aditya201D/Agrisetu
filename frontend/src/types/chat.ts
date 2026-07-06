@@ -29,3 +29,10 @@ export interface Message {
     sender: "user" | "bot";
     text: string;
 }
+
+export interface Conversation {
+    id: number;
+    title: string;
+    created_at: string;
+    updated_at: string;
+}
