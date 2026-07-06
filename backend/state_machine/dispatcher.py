@@ -11,6 +11,7 @@ from state_machine.handlers.show_retailers import show_retailers_handler
 from state_machine.handlers.post_results import post_results_handler
 from state_machine.handlers.no_results import no_results_handler
 
+
 HANDLERS = {
     State.ASK_SEARCH_MODE: search_mode_handler,
     State.ASK_DISTRICT: district_handler,
@@ -21,6 +22,7 @@ HANDLERS = {
     State.POST_RESULTS: post_results_handler,
     State.NO_RESULTS: no_results_handler,
 }
+
 
 INTERNAL_STATES = {
     State.QUERY_DB,
@@ -33,37 +35,30 @@ def process_message(session, message, intent=None):
 
     while True:
 
+        message = normalize_message(session.state, message)
+
         if session.state == State.ASK_SEARCH_MODE and intent is not None:
 
             if session.search_mode == "district":
 
                 if session.district_name:
-
                     if session.product_group:
                         session.state = State.QUERY_DB
                     else:
                         session.state = State.ASK_PRODUCT
-
                 else:
                     session.state = State.ASK_DISTRICT
 
-                continue
-
             elif session.search_mode == "near_me":
                 session.state = State.ASK_LOCATION
-                continue
 
-        message = normalize_message(session.state, message)
-
-        current_state = session.state
-
-        handler = HANDLERS[current_state]
+        handler = HANDLERS[session.state]
         reply = handler(session, message)
 
         if reply is not None:
             return reply
 
-        if current_state in INTERNAL_STATES:
+        if session.state in INTERNAL_STATES:
             message = ""
             continue
 

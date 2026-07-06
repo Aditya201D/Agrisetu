@@ -22,8 +22,10 @@ Use this schema exactly:
 Rules
 
 - Extract only what the user actually provides.
+- Never infer district, location, or search mode.
 - If something is missing, return null.
 - If the user's message is unrelated to fertilizer retailer search, return "in_domain": false.
+- If the user does not explicitly specify a search mode, return "search_mode": null.
 - Correct obvious spelling mistakes whenever possible.
 - "fertilizer" and "fertiliser" mean product_group = "All".
 - "nearby", "closest", "around me", "my location" all mean search_mode = "near_me".
