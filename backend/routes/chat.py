@@ -7,6 +7,13 @@ from schemas.chat_response import ChatResponse
 from services.session_store import get_session
 from state_machine.dispatcher import process_message, INTERNAL_STATES
 from state_machine.states import State
+from services.session_store import (
+    get_session,
+    save_session,
+)
+from database.chat_history import save_message
+from database.chat_history import get_history
+from schemas.chat_history import ChatHistoryMessage
 
 router = APIRouter()
 
@@ -72,6 +79,13 @@ def chat(
                 session=session,
                 options=get_options(session.state),
             )
+        
+    if message:
+        save_message(
+            user_id,
+            "user",
+            message,
+        )
 
     reply = process_message(
         session,
@@ -82,12 +96,36 @@ def chat(
     while session.state in INTERNAL_STATES:
         reply = process_message(session, "")
 
+    save_message(user_id, "bot", reply)
+
+    save_session(
+        str(user_id),
+        session,
+    )
+
     return ChatResponse(
         reply=reply,
         session=session,
         options=get_options(session.state),
     )
 
+@router.get(
+    "/chat/history",
+    response_model=list[ChatHistoryMessage],
+)
+def chat_history(
+    user_id: int = Depends(get_current_user),
+):
+
+    history = get_history(user_id)
+
+    return [
+        ChatHistoryMessage(
+            sender=row["sender"],
+            message=row["message"],
+        )
+        for row in history
+    ]
 
 def get_options(state: State):
     if state == State.ASK_SEARCH_MODE:
