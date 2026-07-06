@@ -11,6 +11,10 @@ from services.session_store import (
     get_session,
     save_session,
 )
+from database.conversations import (
+    create_conversation,
+    touch_conversation,
+)
 from database.chat_history import save_message
 from database.chat_history import get_history
 from schemas.chat_history import ChatHistoryMessage
@@ -29,6 +33,11 @@ def chat(
 ):
     session = get_session(str(user_id))
     intent = None
+
+    # Ensure the user always has an active conversation.
+    if session.conversation_id is None:
+        session.conversation_id = create_conversation(user_id)
+        save_session(str(user_id), session)
 
     message = request.message.strip()
     message_lower = message.lower()
@@ -82,10 +91,12 @@ def chat(
         
     if message:
         save_message(
+            session.conversation_id,
             user_id,
             "user",
             message,
         )
+        touch_conversation(session.conversation_id)
 
     reply = process_message(
         session,
@@ -97,7 +108,13 @@ def chat(
         reply = process_message(session, "")
 
     if reply.strip():
-        save_message(user_id, "bot", reply)
+        save_message(
+            session.conversation_id,
+            user_id,
+            "bot",
+            reply
+        )
+        touch_conversation(session.conversation_id)
 
     save_session(
         str(user_id),

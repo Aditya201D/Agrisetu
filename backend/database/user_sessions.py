@@ -26,12 +26,14 @@ def create_session(user_id: int):
         INSERT INTO user_sessions
         (
             user_id,
-            state
+            state,
+            conversation_id
         )
         VALUES
         (
             :user_id,
-            'ASK_SEARCH_MODE'
+            'ASK_SEARCH_MODE',
+            NULL
         )
     """)
 
@@ -56,7 +58,8 @@ def update_session(user_id: int, session):
             longitude = :longitude,
             radius_km = :radius_km,
             product_group = :product_group,
-            post_results_choice = :post_results_choice
+            post_results_choice = :post_results_choice,
+            conversation_id = :conversation_id
         WHERE user_id = :user_id
     """)
 
@@ -73,6 +76,7 @@ def update_session(user_id: int, session):
                 "radius_km": session.radius_km,
                 "product_group": session.product_group,
                 "post_results_choice": session.post_results_choice,
+                "conversation_id": session.conversation_id,
             },
         )
 

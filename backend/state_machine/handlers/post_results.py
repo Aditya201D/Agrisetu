@@ -1,6 +1,6 @@
 from state_machine.states import State
 from state_machine.utils import reset_session
-from state_machine.ui_text import POST_RESULTS_MENU
+from state_machine.ui_text import POST_RESULTS_MENU, SEARCH_MODE_MENU
 
 def post_results_handler(session, message):
     choice = message.lower().strip()
@@ -32,8 +32,9 @@ def post_results_handler(session, message):
         return None
     
     if choice in ["4", "done"]:
-        session.state = State.END
-        return "Thank you for using AgriSetu!"
+        reset_session(session)
+        session.state = State.ASK_SEARCH_MODE
+        return "Thank you for using AgriSetu!" + SEARCH_MODE_MENU
     
     else:
         return (

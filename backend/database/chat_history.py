@@ -4,6 +4,7 @@ from database.connection import engine
 
 
 def save_message(
+    conversation_id: int,
     user_id: int,
     sender: str,
     message: str,
@@ -12,12 +13,14 @@ def save_message(
     query = text("""
         INSERT INTO chat_history
         (
+            conversation_id,
             user_id,
             sender,
             message
         )
         VALUES
         (
+            :conversation_id,
             :user_id,
             :sender,
             :message
@@ -28,6 +31,7 @@ def save_message(
         conn.execute(
             query,
             {
+                "conversation_id": conversation_id,
                 "user_id": user_id,
                 "sender": sender,
                 "message": message,
@@ -35,7 +39,7 @@ def save_message(
         )
 
 
-def get_history(user_id: int):
+def get_history(conversation_id: int):
 
     query = text("""
         SELECT
@@ -43,7 +47,7 @@ def get_history(user_id: int):
             message,
             created_at
         FROM chat_history
-        WHERE user_id = :user_id
+        WHERE conversation_id = :conversation_id
         ORDER BY id ASC
     """)
 
@@ -51,23 +55,23 @@ def get_history(user_id: int):
         return conn.execute(
             query,
             {
-                "user_id": user_id,
+                "conversation_id": conversation_id,
             },
         ).mappings().all()
 
 
-def clear_history(user_id: int):
+def clear_history(conversation_id: int):
 
     query = text("""
         DELETE
         FROM chat_history
-        WHERE user_id = :user_id
+        WHERE conversation_id = :conversation_id
     """)
 
     with engine.begin() as conn:
         conn.execute(
             query,
             {
-                "user_id": user_id,
+                "conversation_id": conversation_id,
             },
         )

@@ -13,3 +13,4 @@ class Session(BaseModel):
     product_group: str | None = None
     last_results: list[RetailerResult] | None = None
     post_results_choice: str | None = None
+    conversation_id: int | None = None

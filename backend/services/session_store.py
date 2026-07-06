@@ -25,6 +25,7 @@ def get_session(user_id: str) -> Session:
         product_group=row["product_group"],
         post_results_choice=row["post_results_choice"],
         last_results=None,
+        conversation_id=row["conversation_id"],
     )
 
 
