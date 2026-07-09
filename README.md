@@ -10,7 +10,7 @@ The application is built using a React frontend, a FastAPI backend, and a MySQL 
 
 ## Demo
 
-![Screenshot](frontend/public/agrisetu.png)
+![Screenshot](frontend/public/agrisetuv2.png)
 
 ![Demo](frontend/public/output_high.gif)
 
